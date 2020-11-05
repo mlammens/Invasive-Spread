@@ -1,0 +1,18 @@
+---
+title: "Preliminary Analysis"
+author: "Megan Sweeny"
+date: "5/12/2020"
+output: html_document
+---
+
+
+load dataset
+
+```{r}
+NorwayMaple_GBIF<- read.csv(file="Distribution Data/Norway Maple/Norway Maple GBIF Data/NM_GBIF Data.csv")
+```
+
+```{r}
+
+```
+
