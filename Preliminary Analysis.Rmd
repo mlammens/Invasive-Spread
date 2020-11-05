@@ -8,11 +8,8 @@ output: html_document
 
 load dataset
 
-```{r}
-NorwayMaple_GBIF<- read.csv(file="Distribution Data/Norway Maple/Norway Maple GBIF Data/NM_GBIF Data.csv")
-```
 
 ```{r}
-
+all_data = read.csv("Distribution Data/MASTER.csv")
 ```
 
