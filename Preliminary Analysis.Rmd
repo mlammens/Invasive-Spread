@@ -13,3 +13,11 @@ load dataset
 all_data = read.csv("Distribution Data/MASTER.csv")
 ```
 
+do some data exploration
+
+```{r}
+table(all_data$SciName)
+```
+
+
+
