@@ -21,3 +21,9 @@ table(all_data$SciName)
 
 
 
+```{r}
+plot(x = all_data$Longitude,y = all_data$Latitude)
+```
+
+
+
