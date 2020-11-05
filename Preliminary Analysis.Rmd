@@ -19,7 +19,7 @@ do some data exploration
 table(all_data$SciName)
 ```
 
-
+This is a plot. There are outliers.
 
 ```{r}
 plot(x = all_data$Longitude,y = all_data$Latitude)
