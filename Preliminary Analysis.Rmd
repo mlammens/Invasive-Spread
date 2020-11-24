@@ -5,15 +5,51 @@ date: "5/12/2020"
 output: html_document
 ---
 
-
-load dataset
-
+# Load in R packages for analysis
 
 ```{r}
-all_data = read.csv("Distribution Data/MASTER.csv")
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(readr)
 ```
 
-do some data exploration
+# Load in data set
+
+```{r}
+all_data = read_csv("Distribution Data/MASTER.csv")
+```
+
+
+# Data summary and exploration
+
+## `summary` of the data set
+
+```{r}
+summary(all_data)
+```
+
+### Data formating
+
+Format the date column
+
+```{r}
+(all_data$ObsDate)
+```
+
+
+
+### Examine differences between records with and without lat/lon
+
+```{r}
+# Create a new column for lat/lon indicator
+all_data$HasCoord <- !is.na(all_data$Latitude)
+
+# Examine differences in year of record based on whether record
+# has lat/lon or not
+ggplot(data = all_data, aes(x = HasCoord, y = ))
+```
+
 
 ```{r}
 table(all_data$SciName)
