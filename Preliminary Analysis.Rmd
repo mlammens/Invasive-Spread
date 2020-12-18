@@ -12,6 +12,8 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(readr)
+
+source("herbarium_functions.R")
 ```
 
 # Load in data set
@@ -29,14 +31,11 @@ all_data = read_csv("Distribution Data/MASTER.csv")
 summary(all_data)
 ```
 
-### Data formating
-
-Format the date column
+### Add decade
 
 ```{r}
-(all_data$ObsDate)
+all_data$ObsDate_Decade <- round.up(all_data$ObsDate_Year)
 ```
-
 
 
 ### Examine differences between records with and without lat/lon
@@ -47,13 +46,99 @@ all_data$HasCoord <- !is.na(all_data$Latitude)
 
 # Examine differences in year of record based on whether record
 # has lat/lon or not
-ggplot(data = all_data, aes(x = HasCoord, y = ))
+ggplot(data = all_data, aes(x = ObsDate_Decade, fill = HasCoord)) +
+  geom_bar() +
+  scale_y_log10()
+```
+
+### Create a simplified species name column
+
+Species are:
+
+* Acer platanoides
+* Actinidia arguta
+* Ailanthus altissima
+* Aralia elata
+* Frangula alnus (Rhamnus frangula)
+* Nandina domestica
+* Pyrus calleryana
+* Rhamnus cathartica
+* Tamarix
+* Viburnum dilatatum
+* Vitex rotundifolia
+
+```{r}
+# Make a Species column
+all_data$Species <- NA
+
+# Identify each of the species
+all_data$Species[grep(all_data$SciName, pattern = "Acer platanoides")] <- "Acer platanoides"
+all_data$Species[grep(all_data$SciName, pattern = "Actinidia arguta")] <- "Actinidia arguta"
+all_data$Species[grep(all_data$SciName, pattern = "Ailanthus altissima")] <- "Ailanthus altissima"
+all_data$Species[grep(all_data$SciName, pattern = "Aralia elata")] <- "Aralia elata"
+all_data$Species[grep(all_data$SciName, pattern = "Frangula alnus")] <- "Frangula alnus"
+all_data$Species[grep(all_data$SciName, pattern = "Rhamnus frangula")] <- "Frangula alnus"
+all_data$Species[grep(all_data$SciName, pattern = "Nandina domestica")] <- "Nandina domestica"
+all_data$Species[grep(all_data$SciName, pattern = "Pyrus calleryana")] <- "Pyrus calleryana"
+all_data$Species[grep(all_data$SciName, pattern = "Rhamnus cathartica")] <- "Rhamnus cathartica"
+all_data$Species[grep(all_data$SciName, pattern = "Tamarix")] <- "Tamarix"
+all_data$Species[grep(all_data$SciName, pattern = "Viburnum dilatatum")] <- "Viburnum dilatatum"
+all_data$Species[grep(all_data$SciName, pattern = "Vitex rotundifolia")] <- "Vitex rotundifolia"
+
+```
+
+
+## Data cleaning
+
+Save a copy of the unfiltered data set.
+
+```{r}
+all_data_unfiltered <- all_data
+```
+
+### Species information
+
+Remove the species that are listed as NA after the above species simplifications.
+
+```{r}
+all_data <- filter(all_data, !is.na(Species))
+```
+
+
+### Date information
+
+Remove records where the observation year is greater than 2020 or is NA.
+
+```{r}
+all_data <- filter(all_data, !is.na(ObsDate_Year))
+all_data <- filter(all_data, ObsDate_Year < 2020)
+
+```
+
+
+
+Experiment with cumulative records calculations
+
+```{r}
+all_spec_cumRecs <-
+  all_data %>%
+  group_by(Species, ObsDate_Year) %>%
+  tally()
+
+all_spec_cumRecs <-
+  all_spec_cumRecs %>%
+  group_by(Species) %>%
+  mutate(CumRecs = cumsum(n))
 ```
 
 
 ```{r}
-table(all_data$SciName)
+ggplot(all_spec_cumRecs, aes(x = ObsDate_Year, y = CumRecs, color = Species)) +
+  geom_line() +
+  scale_y_log10()
 ```
+
+
 
 This is a plot. There are outliers.
 
