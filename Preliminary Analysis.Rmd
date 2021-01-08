@@ -19,7 +19,7 @@ source("herbarium_functions.R")
 # Load in data set
 
 ```{r}
-all_data = read_csv("Distribution Data/MASTER.csv")
+all_data = read.csv("Distribution Data/MASTER.csv")
 ```
 
 
@@ -31,25 +31,20 @@ all_data = read_csv("Distribution Data/MASTER.csv")
 summary(all_data)
 ```
 
+### Note if record has lat/lon values
+
+```{r}
+# Create a new column for lat/lon indicator
+all_data$HasCoord <- !is.na(all_data$Latitude)
+```
+
+
 ### Add decade
 
 ```{r}
 all_data$ObsDate_Decade <- round.up(all_data$ObsDate_Year)
 ```
 
-
-### Examine differences between records with and without lat/lon
-
-```{r}
-# Create a new column for lat/lon indicator
-all_data$HasCoord <- !is.na(all_data$Latitude)
-
-# Examine differences in year of record based on whether record
-# has lat/lon or not
-ggplot(data = all_data, aes(x = ObsDate_Decade, fill = HasCoord)) +
-  geom_bar() +
-  scale_y_log10()
-```
 
 ### Create a simplified species name column
 
@@ -86,6 +81,13 @@ all_data$Species[grep(all_data$SciName, pattern = "Viburnum dilatatum")] <- "Vib
 all_data$Species[grep(all_data$SciName, pattern = "Vitex rotundifolia")] <- "Vitex rotundifolia"
 
 ```
+
+### Add Herbarium column
+
+```{r}
+all_data$IsHerbarium <- as.numeric(all_data$BasisOfRecord == "PRESERVED_SPECIMEN")
+```
+
 
 
 ## Data cleaning
@@ -136,6 +138,33 @@ all_spec_cumRecs <-
 ggplot(all_spec_cumRecs, aes(x = ObsDate_Year, y = CumRecs, color = Species)) +
   geom_line() +
   scale_y_log10()
+```
+
+### Examine differences between records with and without lat/lon
+
+```{r}
+# Examine differences in year of record based on whether record
+# has lat/lon or not
+ggplot(data = all_data, aes(x = ObsDate_Decade, fill = HasCoord)) +
+  geom_bar() +
+  scale_y_log10()
+```
+
+```{r}
+# Examine differences in year of record based on whether record
+# has lat/lon or not
+ggplot(data = all_data, aes(x = ObsDate_Decade, fill = as.factor(IsHerbarium))) +
+  geom_bar(position = "dodge") +
+  scale_y_log10()
+```
+
+
+Does the count increase in iNaturalist observations correspond with the same pattern as increases over a longer period of time (pre-cell phones, etc.).
+
+### How many of the occurences are from iNaturalist?
+
+```{r}
+sum(grepl(pattern = "iNaturalist", all_data$Reporter))
 ```
 
 
