@@ -12,6 +12,7 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(readr)
+library(rnaturalearth)
 
 source("herbarium_functions.R")
 ```
@@ -117,6 +118,31 @@ all_data <- filter(all_data, ObsDate_Year < 2020)
 
 ```
 
+### Spatial cleaning
+
+Remove any records that are outside of the contiguous United States, as these represent either records that are incorrect, or not interesting to our analysis.
+
+Get a map of the US.
+
+```{r}
+
+library(sf)
+
+cntry <- st_read("~/Google Drive/gis_layers/admin.shp")
+
+
+ggplot(data = filter(cntry, FIPS_CNTRY == "US",
+                     !(ADMIN_NAME %in% c("Alaska", "Hawaii", "Guantanamo Bay")) )) +
+  geom_sf()
+
+summary(cntry)
+
+```
+
+
+
+
+# Exploratory data analysis
 
 
 Experiment with cumulative records calculations
@@ -152,7 +178,7 @@ ggplot(data = all_data, aes(x = ObsDate_Decade, fill = HasCoord)) +
 
 ```{r}
 # Examine differences in year of record based on whether record
-# has lat/lon or not
+# is an herbarium record
 ggplot(data = all_data, aes(x = ObsDate_Decade, fill = as.factor(IsHerbarium))) +
   geom_bar(position = "dodge") +
   scale_y_log10()
